@@ -10,97 +10,12 @@ from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
-from uc3m_money.attributes.concept import Concept
 from uc3m_money.attributes.iban import Iban
-from uc3m_money.attributes.transfer_type import TransferType
-from uc3m_money.attributes.transfer_date import  TransferDate
-from uc3m_money.attributes.transfer_amount import TransferAmount
-from uc3m_money.attributes.deposit_amount import DepositAmount
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
     def __init__(self):
         pass
-
-    @staticmethod
-    def validate_iban(input_iban: str):
-        """
-    Calcula el dígito de control de un IBAN español.
-
-    Args:
-        input_iban (str): El IBAN sin los dos últimos dígitos (dígito de control).
-
-    Returns:
-        str: El dígito de control calculado.
-        """
-        iban_regex = re.compile(r"^ES[0-9]{22}")
-        iban_match = iban_regex.fullmatch(input_iban)
-        if not iban_match:
-            raise AccountManagementException("Invalid IBAN format")
-        iban = input_iban
-        original_code = iban[2:4]
-        #replacing the control
-        iban = iban[:2] + "00" + iban[4:]
-        iban = iban[4:] + iban[:4]
-
-
-        # Convertir el IBAN en una cadena numérica, reemplazando letras por números
-        iban = (iban.replace('A', '10').replace('B', '11').
-                replace('C', '12').replace('D', '13').replace('E', '14').
-                replace('F', '15'))
-        iban = (iban.replace('G', '16').replace('H', '17').
-                replace('I', '18').replace('J', '19').replace('K', '20').
-                replace('L', '21'))
-        iban = (iban.replace('M', '22').replace('N', '23').
-                replace('O', '24').replace('P', '25').replace('Q', '26').
-                replace('R', '27'))
-        iban = (iban.replace('S', '28').replace('T', '29').replace('U', '30').
-                replace('V', '31').replace('W', '32').replace('X', '33'))
-        iban = iban.replace('Y', '34').replace('Z', '35')
-
-        # Convertir la cadena en un número entero
-        parsed_int_iban = int(iban)
-
-        # Calcular el módulo 97
-        mod = parsed_int_iban % 97
-
-        # Calcular el dígito de control (97 menos el módulo)
-        control_digit = 98 - mod
-
-        if int(original_code) != control_digit:
-            #print(dc)
-            raise AccountManagementException("Invalid IBAN control digit")
-
-        return input_iban
-
-    def validate_concept(self, concept: str):
-        """regular expression for checking the minimum and maximum length as well as
-        the allowed characters and spaces restrictions
-        there are other ways to check this"""
-        concept_regex = re.compile(r"^(?=^.{10,30}$)([a-zA-Z]+(\s[a-zA-Z]+)+)$")
-
-        concept_match = concept_regex.fullmatch(concept)
-        if not concept_match:
-            raise AccountManagementException ("Invalid concept format")
-
-    def validate_transfer_date(self, transfer_date):
-        """validates the arrival date format  using regex"""
-        transfer_date_regex = re.compile(r"^(([0-2]\d|3[0-1])\/(0\d|1[0-2])\/\d\d\d\d)$")
-        transfer_date_match = transfer_date_regex.fullmatch(transfer_date)
-        if not transfer_date_match:
-            raise AccountManagementException("Invalid date format")
-
-        try:
-            parsed_transfer_date  = datetime.strptime(transfer_date, "%d/%m/%Y").date()
-        except ValueError as ex:
-            raise AccountManagementException("Invalid date format") from ex
-
-        if parsed_transfer_date < datetime.now(timezone.utc).date():
-            raise AccountManagementException("Transfer date must be today or later.")
-
-        if parsed_transfer_date.year < 2025 or parsed_transfer_date.year > 2050:
-            raise AccountManagementException("Invalid date format")
-        return transfer_date
     #pylint: disable=too-many-arguments
     def transfer_request(self, from_iban: str,
                          to_iban: str,
@@ -110,19 +25,13 @@ class AccountManager:
                          amount: float)->str:
         """first method: receives transfer info and
         stores it into a file"""
-        # self.validate_iban(from_iban)
-        # self.validate_iban(to_iban)
-        # self.validate_concept(concept)
-        # self.validate_transfer_type(transfer_type)
-        # self.validate_transfer_date(date)
-        # self.validate_transfer_amount(amount)
 
-        new_transfer_request = TransferRequest(from_iban=Iban(from_iban).attribute_value,
-                                     to_iban=Iban(to_iban).attribute_value,
-                                     transfer_concept=Concept(concept).attribute_value,
-                                     transfer_type=TransferType(transfer_type).attribute_value,
-                                     transfer_date=TransferDate(date).attribute_value,
-                                     transfer_amount=TransferAmount(amount).attribute_value)
+        new_transfer_request = TransferRequest(from_iban=from_iban,
+                                     to_iban=to_iban,
+                                     transfer_concept=concept,
+                                     transfer_type=transfer_type,
+                                     transfer_date=date,
+                                     transfer_amount=amount)
 
         try:
             with open(TRANSFERS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
@@ -153,25 +62,6 @@ class AccountManager:
 
         return new_transfer_request.transfer_code
 
-    def validate_transfer_amount(self, amount):
-        try:
-            parsed_float_amount = float(amount)
-        except ValueError as ex:
-            raise AccountManagementException("Invalid transfer amount") from ex
-        parsed_string_amount = str(parsed_float_amount)
-        if '.' in parsed_string_amount:
-            number_of_decimals = len(parsed_string_amount.split('.')[1])
-            if number_of_decimals > 2:
-                raise AccountManagementException("Invalid transfer amount")
-        if parsed_float_amount < 10 or parsed_float_amount > 10000:
-            raise AccountManagementException("Invalid transfer amount")
-
-    def validate_transfer_type(self, transfer_type):
-        transfer_type_regex = re.compile(r"(ORDINARY|INMEDIATE|URGENT)")
-        transfer_type_match = transfer_type_regex.fullmatch(transfer_type)
-        if not transfer_type_match:
-            raise AccountManagementException("Invalid transfer type")
-
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
         try:
@@ -185,14 +75,8 @@ class AccountManager:
         # comprobar valores del fichero
         deposit_amount, deposit_iban = self.get_deposit_iban_and_amount(input_deposit)
 
-
-        # deposit_iban = self.validate_iban(deposit_iban)
-        deposit_iban = Iban(deposit_iban).attribute_value
-        # parsed_deposit_amount = self.validate_deposit_amount(deposit_amount)
-        parsed_deposit_amount = DepositAmount(deposit_amount).attribute_value
-
         new_deposit = AccountDeposit(to_iban=deposit_iban,
-                                     deposit_amount=parsed_deposit_amount)
+                                     deposit_amount=deposit_amount)
 
         try:
             with open(DEPOSITS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
@@ -213,16 +97,6 @@ class AccountManager:
             raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
 
         return new_deposit.deposit_signature
-
-    def validate_deposit_amount(self, deposit_amount):
-        deposit_amount_regex = re.compile(r"^EUR [0-9]{4}\.[0-9]{2}")
-        deposit_amount_match = deposit_amount_regex.fullmatch(deposit_amount)
-        if not deposit_amount_match:
-            raise AccountManagementException("Error - Invalid deposit amount")
-        parsed_deposit_amount = float(deposit_amount[4:])
-        if parsed_deposit_amount == 0:
-            raise AccountManagementException("Error - Deposit must be greater than 0")
-        return parsed_deposit_amount
 
     def get_deposit_iban_and_amount(self, input_deposit):
         try:
