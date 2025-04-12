@@ -10,7 +10,12 @@ from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
-
+from uc3m_money.attributes.concept import Concept
+from uc3m_money.attributes.iban import Iban
+from uc3m_money.attributes.transfer_type import TransferType
+from uc3m_money.attributes.transfer_date import  TransferDate
+from uc3m_money.attributes.transfer_amount import TransferAmount
+from uc3m_money.attributes.deposit_amount import DepositAmount
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -52,8 +57,6 @@ class AccountManager:
         iban = (iban.replace('S', '28').replace('T', '29').replace('U', '30').
                 replace('V', '31').replace('W', '32').replace('X', '33'))
         iban = iban.replace('Y', '34').replace('Z', '35')
-
-        # Mover los cuatro primeros caracteres al final
 
         # Convertir la cadena en un número entero
         parsed_int_iban = int(iban)
@@ -107,18 +110,19 @@ class AccountManager:
                          amount: float)->str:
         """first method: receives transfer info and
         stores it into a file"""
-        self.validate_iban(from_iban)
-        self.validate_iban(to_iban)
-        self.validate_concept(concept)
-        self.validate_transfer_type(date, transfer_type)
-        self.validate_transfer_amount(amount)
+        # self.validate_iban(from_iban)
+        # self.validate_iban(to_iban)
+        # self.validate_concept(concept)
+        # self.validate_transfer_type(transfer_type)
+        # self.validate_transfer_date(date)
+        # self.validate_transfer_amount(amount)
 
-        new_transfer_request = TransferRequest(from_iban=from_iban,
-                                     to_iban=to_iban,
-                                     transfer_concept=concept,
-                                     transfer_type=transfer_type,
-                                     transfer_date=date,
-                                     transfer_amount=amount)
+        new_transfer_request = TransferRequest(from_iban=Iban(from_iban).attribute_value,
+                                     to_iban=Iban(to_iban).attribute_value,
+                                     transfer_concept=Concept(concept).attribute_value,
+                                     transfer_type=TransferType(transfer_type).attribute_value,
+                                     transfer_date=TransferDate(date).attribute_value,
+                                     transfer_amount=TransferAmount(amount).attribute_value)
 
         try:
             with open(TRANSFERS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
@@ -162,12 +166,11 @@ class AccountManager:
         if parsed_float_amount < 10 or parsed_float_amount > 10000:
             raise AccountManagementException("Invalid transfer amount")
 
-    def validate_transfer_type(self, date, transfer_type):
+    def validate_transfer_type(self, transfer_type):
         transfer_type_regex = re.compile(r"(ORDINARY|INMEDIATE|URGENT)")
         transfer_type_match = transfer_type_regex.fullmatch(transfer_type)
         if not transfer_type_match:
             raise AccountManagementException("Invalid transfer type")
-        self.validate_transfer_date(date)
 
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
@@ -183,8 +186,10 @@ class AccountManager:
         deposit_amount, deposit_iban = self.get_deposit_iban_and_amount(input_deposit)
 
 
-        deposit_iban = self.validate_iban(deposit_iban)
-        parsed_deposit_amount = self.validate_deposit_amount(deposit_amount)
+        # deposit_iban = self.validate_iban(deposit_iban)
+        deposit_iban = Iban(deposit_iban).attribute_value
+        # parsed_deposit_amount = self.validate_deposit_amount(deposit_amount)
+        parsed_deposit_amount = DepositAmount(deposit_amount).attribute_value
 
         new_deposit = AccountDeposit(to_iban=deposit_iban,
                                      deposit_amount=parsed_deposit_amount)
@@ -242,7 +247,8 @@ class AccountManager:
 
     def calculate_balance(self, iban:str)->bool:
         """calculate the balance for a given iban"""
-        iban = self.validate_iban(iban)
+        # iban = self.validate_iban(iban)
+        iban = Iban(iban).attribute_value
         transaction_store = self.read_transactions_file()
         total_balance = self.get_total_balance(iban, transaction_store)
 
