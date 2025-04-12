@@ -110,27 +110,8 @@ class AccountManager:
         self.validate_iban(from_iban)
         self.validate_iban(to_iban)
         self.validate_concept(concept)
-        transfer_type_regex = re.compile(r"(ORDINARY|INMEDIATE|URGENT)")
-        transfer_type_match = transfer_type_regex.fullmatch(transfer_type)
-        if not transfer_type_match:
-            raise AccountManagementException("Invalid transfer type")
-        self.validate_transfer_date(date)
-
-
-
-        try:
-            parsed_float_amount  = float(amount)
-        except ValueError as ex:
-            raise AccountManagementException("Invalid transfer amount") from ex
-
-        parsed_string_amount = str(parsed_float_amount)
-        if '.' in parsed_string_amount:
-            number_of_decimals = len(parsed_string_amount.split('.')[1])
-            if number_of_decimals > 2:
-                raise AccountManagementException("Invalid transfer amount")
-
-        if parsed_float_amount < 10 or parsed_float_amount > 10000:
-            raise AccountManagementException("Invalid transfer amount")
+        self.validate_transfer_type(date, transfer_type)
+        self.validate_transfer_amount(amount)
 
         new_transfer_request = TransferRequest(from_iban=from_iban,
                                      to_iban=to_iban,
@@ -168,6 +149,26 @@ class AccountManager:
 
         return new_transfer_request.transfer_code
 
+    def validate_transfer_amount(self, amount):
+        try:
+            parsed_float_amount = float(amount)
+        except ValueError as ex:
+            raise AccountManagementException("Invalid transfer amount") from ex
+        parsed_string_amount = str(parsed_float_amount)
+        if '.' in parsed_string_amount:
+            number_of_decimals = len(parsed_string_amount.split('.')[1])
+            if number_of_decimals > 2:
+                raise AccountManagementException("Invalid transfer amount")
+        if parsed_float_amount < 10 or parsed_float_amount > 10000:
+            raise AccountManagementException("Invalid transfer amount")
+
+    def validate_transfer_type(self, date, transfer_type):
+        transfer_type_regex = re.compile(r"(ORDINARY|INMEDIATE|URGENT)")
+        transfer_type_match = transfer_type_regex.fullmatch(transfer_type)
+        if not transfer_type_match:
+            raise AccountManagementException("Invalid transfer type")
+        self.validate_transfer_date(date)
+
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
         try:
@@ -179,22 +180,11 @@ class AccountManager:
             raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
 
         # comprobar valores del fichero
-        try:
-            deposit_iban = input_deposit["IBAN"]
-            deposit_amount = input_deposit["AMOUNT"]
-        except KeyError as e:
-            raise AccountManagementException("Error - Invalid Key in JSON") from e
+        deposit_amount, deposit_iban = self.get_deposit_iban_and_amount(input_deposit)
 
 
         deposit_iban = self.validate_iban(deposit_iban)
-        deposit_amount_regex = re.compile(r"^EUR [0-9]{4}\.[0-9]{2}")
-        deposit_amount_match = deposit_amount_regex.fullmatch(deposit_amount)
-        if not deposit_amount_match:
-            raise AccountManagementException("Error - Invalid deposit amount")
-
-        parsed_deposit_amount = float(deposit_amount[4:])
-        if parsed_deposit_amount == 0:
-            raise AccountManagementException("Error - Deposit must be greater than 0")
+        parsed_deposit_amount = self.validate_deposit_amount(deposit_amount)
 
         new_deposit = AccountDeposit(to_iban=deposit_iban,
                                      deposit_amount=parsed_deposit_amount)
@@ -219,6 +209,23 @@ class AccountManager:
 
         return new_deposit.deposit_signature
 
+    def validate_deposit_amount(self, deposit_amount):
+        deposit_amount_regex = re.compile(r"^EUR [0-9]{4}\.[0-9]{2}")
+        deposit_amount_match = deposit_amount_regex.fullmatch(deposit_amount)
+        if not deposit_amount_match:
+            raise AccountManagementException("Error - Invalid deposit amount")
+        parsed_deposit_amount = float(deposit_amount[4:])
+        if parsed_deposit_amount == 0:
+            raise AccountManagementException("Error - Deposit must be greater than 0")
+        return parsed_deposit_amount
+
+    def get_deposit_iban_and_amount(self, input_deposit):
+        try:
+            deposit_iban = input_deposit["IBAN"]
+            deposit_amount = input_deposit["AMOUNT"]
+        except KeyError as e:
+            raise AccountManagementException("Error - Invalid Key in JSON") from e
+        return deposit_amount, deposit_iban
 
     def read_transactions_file(self):
         """loads the content of the transactions file
@@ -237,15 +244,7 @@ class AccountManager:
         """calculate the balance for a given iban"""
         iban = self.validate_iban(iban)
         transaction_store = self.read_transactions_file()
-        iban_found = False
-        total_balance = 0
-        for transaction in transaction_store:
-            #print(transaction["IBAN"] + " - " + iban)
-            if transaction["IBAN"] == iban:
-                total_balance += float(transaction["amount"])
-                iban_found = True
-        if not iban_found:
-            raise AccountManagementException("IBAN not found")
+        total_balance = self.get_total_balance(iban, transaction_store)
 
         final_balance = {"IBAN": iban,
                         "time": datetime.timestamp(datetime.now(timezone.utc)),
@@ -267,3 +266,15 @@ class AccountManager:
         except FileNotFoundError as ex:
             raise AccountManagementException("Wrong file  or file path") from ex
         return True
+
+    def get_total_balance(self, iban, transaction_store):
+        iban_found = False
+        total_balance = 0
+        for transaction in transaction_store:
+            # print(transaction["IBAN"] + " - " + iban)
+            if transaction["IBAN"] == iban:
+                total_balance += float(transaction["amount"])
+                iban_found = True
+        if not iban_found:
+            raise AccountManagementException("IBAN not found")
+        return total_balance
