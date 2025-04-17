@@ -1,6 +1,6 @@
 import json
 
-from ..account_management_config import TRANSFERS_STORE_FILE, DEPOSITS_STORE_FILE
+from ..account_management_config import TRANSFERS_STORE_FILE, DEPOSITS_STORE_FILE, TRANSACTIONS_STORE_FILE
 from ..account_management_exception import AccountManagementException
 
 def save_transfer_request(new_transfer_request):
@@ -67,3 +67,16 @@ def deposit_json_store(new_deposit):
         raise AccountManagementException("Wrong file  or file path") from ex
     except json.JSONDecodeError as ex:
         raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
+
+
+def transactions_json_store():
+    """loads the content of the transactions file
+    and returns a list"""
+    try:
+        with open(TRANSACTIONS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
+            transaction_store = json.load(file)
+    except FileNotFoundError as ex:
+        raise AccountManagementException("Wrong file  or file path") from ex
+    except json.JSONDecodeError as ex:
+        raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
+    return transaction_store
