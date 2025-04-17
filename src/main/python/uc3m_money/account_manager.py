@@ -1,10 +1,8 @@
 """Account manager module """
-import json
 from datetime import datetime, timezone
 from uc3m_money.account_management_exception import AccountManagementException
-from uc3m_money.account_management_config import (BALANCES_STORE_FILE)
 from uc3m_money.storage.json_store import save_transfer_request, input_deposit_json_store, deposit_json_store, \
-    transactions_json_store
+    transactions_json_store, account_balance_json_store
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
@@ -57,21 +55,7 @@ class AccountManager:
                         "time": datetime.timestamp(datetime.now(timezone.utc)),
                         "BALANCE": total_balance}
 
-        try:
-            with open(BALANCES_STORE_FILE, "r", encoding="utf-8", newline="") as file:
-                balance_store = json.load(file)
-        except FileNotFoundError:
-            balance_store = []
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        balance_store.append(final_balance)
-
-        try:
-            with open(BALANCES_STORE_FILE, "w", encoding="utf-8", newline="") as file:
-                json.dump(balance_store, file, indent=2)
-        except FileNotFoundError as ex:
-            raise AccountManagementException("Wrong file  or file path") from ex
+        account_balance_json_store(final_balance)
         return True
 
     def get_total_balance(self, iban, transaction_store):
