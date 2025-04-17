@@ -5,7 +5,7 @@ from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.account_management_config import (DEPOSITS_STORE_FILE,
                                                   TRANSACTIONS_STORE_FILE,
                                                   BALANCES_STORE_FILE)
-from uc3m_money.storage.json_store import save_transfer_request
+from uc3m_money.storage.json_store import save_transfer_request, input_deposit_json_store
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
@@ -38,16 +38,7 @@ class AccountManager:
 
     def deposit_into_account(self, input_file:str)->str:
         """manages the deposits received for accounts"""
-        try:
-            with open(input_file, "r", encoding="utf-8", newline="") as file:
-                input_deposit = json.load(file)
-        except FileNotFoundError as ex:
-            raise AccountManagementException("Error: file input not found") from ex
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        # comprobar valores del fichero
-        deposit_amount, deposit_iban = self.get_deposit_iban_and_amount(input_deposit)
+        deposit_amount, deposit_iban = input_deposit_json_store(input_file)
 
         new_deposit = AccountDeposit(to_iban=deposit_iban,
                                      deposit_amount=deposit_amount)
@@ -71,14 +62,6 @@ class AccountManager:
             raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
 
         return new_deposit.deposit_signature
-
-    def get_deposit_iban_and_amount(self, input_deposit):
-        try:
-            deposit_iban = input_deposit["IBAN"]
-            deposit_amount = input_deposit["AMOUNT"]
-        except KeyError as e:
-            raise AccountManagementException("Error - Invalid Key in JSON") from e
-        return deposit_amount, deposit_iban
 
     def read_transactions_file(self):
         """loads the content of the transactions file

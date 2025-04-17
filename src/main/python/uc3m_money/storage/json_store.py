@@ -27,3 +27,25 @@ def save_transfer_request(new_transfer_request):
         raise AccountManagementException("Wrong file  or file path") from ex
     except json.JSONDecodeError as ex:
         raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
+
+
+def get_deposit_iban_and_amount(input_deposit):
+    try:
+        deposit_iban = input_deposit["IBAN"]
+        deposit_amount = input_deposit["AMOUNT"]
+    except KeyError as e:
+        raise AccountManagementException("Error - Invalid Key in JSON") from e
+    return deposit_amount, deposit_iban
+
+
+def input_deposit_json_store(input_file):
+    try:
+        with open(input_file, "r", encoding="utf-8", newline="") as file:
+            input_deposit = json.load(file)
+    except FileNotFoundError as ex:
+        raise AccountManagementException("Error: file input not found") from ex
+    except json.JSONDecodeError as ex:
+        raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
+    # comprobar valores del fichero
+    deposit_amount, deposit_iban = get_deposit_iban_and_amount(input_deposit)
+    return deposit_amount, deposit_iban
