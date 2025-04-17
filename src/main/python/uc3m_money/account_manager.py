@@ -2,10 +2,9 @@
 import json
 from datetime import datetime, timezone
 from uc3m_money.account_management_exception import AccountManagementException
-from uc3m_money.account_management_config import (DEPOSITS_STORE_FILE,
-                                                  TRANSACTIONS_STORE_FILE,
+from uc3m_money.account_management_config import (TRANSACTIONS_STORE_FILE,
                                                   BALANCES_STORE_FILE)
-from uc3m_money.storage.json_store import save_transfer_request, input_deposit_json_store
+from uc3m_money.storage.json_store import save_transfer_request, input_deposit_json_store, deposit_json_store
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
@@ -43,23 +42,7 @@ class AccountManager:
         new_deposit = AccountDeposit(to_iban=deposit_iban,
                                      deposit_amount=deposit_amount)
 
-        try:
-            with open(DEPOSITS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
-                deposit_store = json.load(file)
-        except FileNotFoundError as ex:
-            deposit_store = []
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        deposit_store.append(new_deposit.to_json())
-
-        try:
-            with open(DEPOSITS_STORE_FILE, "w", encoding="utf-8", newline="") as file:
-                json.dump(deposit_store, file, indent=2)
-        except FileNotFoundError as ex:
-            raise AccountManagementException("Wrong file  or file path") from ex
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
+        deposit_json_store(new_deposit)
 
         return new_deposit.deposit_signature
 
