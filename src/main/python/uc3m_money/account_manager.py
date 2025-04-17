@@ -1,12 +1,11 @@
 """Account manager module """
-import re
 import json
 from datetime import datetime, timezone
 from uc3m_money.account_management_exception import AccountManagementException
-from uc3m_money.account_management_config import (TRANSFERS_STORE_FILE,
-                                        DEPOSITS_STORE_FILE,
-                                        TRANSACTIONS_STORE_FILE,
-                                        BALANCES_STORE_FILE)
+from uc3m_money.account_management_config import (DEPOSITS_STORE_FILE,
+                                                  TRANSACTIONS_STORE_FILE,
+                                                  BALANCES_STORE_FILE)
+from uc3m_money.storage.json_store import save_transfer_request
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
@@ -33,32 +32,7 @@ class AccountManager:
                                      transfer_date=date,
                                      transfer_amount=amount)
 
-        try:
-            with open(TRANSFERS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
-                transfer_store = json.load(file)
-        except FileNotFoundError:
-            transfer_store = []
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        for transfer in transfer_store:
-            if (transfer["from_iban"] == new_transfer_request.from_iban and
-                    transfer["to_iban"] == new_transfer_request.to_iban and
-                    transfer["transfer_date"] == new_transfer_request.transfer_date and
-                    transfer["transfer_amount"] == new_transfer_request.transfer_amount and
-                    transfer["transfer_concept"] == new_transfer_request.transfer_concept and
-                    transfer["transfer_type"] == new_transfer_request.transfer_type):
-                raise AccountManagementException("Duplicated transfer in transfer list")
-
-        transfer_store.append(new_transfer_request.to_json())
-
-        try:
-            with open(TRANSFERS_STORE_FILE, "w", encoding="utf-8", newline="") as file:
-                json.dump(transfer_store, file, indent=2)
-        except FileNotFoundError as ex:
-            raise AccountManagementException("Wrong file  or file path") from ex
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
+        save_transfer_request(new_transfer_request)
 
         return new_transfer_request.transfer_code
 
