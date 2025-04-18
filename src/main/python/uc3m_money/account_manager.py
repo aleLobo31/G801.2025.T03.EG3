@@ -2,7 +2,7 @@
 from datetime import datetime, timezone
 from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.storage.json_store import input_deposit_json_store,\
-    transactions_json_store, account_balance_json_store
+    transactions_json_store
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit

@@ -1,6 +1,6 @@
 import json
 
-from ..account_management_config import TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE
+from ..account_management_config import TRANSACTIONS_STORE_FILE
 from ..account_management_exception import AccountManagementException
 
 class JsonStore:
@@ -71,19 +71,3 @@ def transactions_json_store():
     except json.JSONDecodeError as ex:
         raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
     return transaction_store
-
-
-def account_balance_json_store(final_balance):
-    try:
-        with open(BALANCES_STORE_FILE, "r", encoding="utf-8", newline="") as file:
-            balance_store = json.load(file)
-    except FileNotFoundError:
-        balance_store = []
-    except json.JSONDecodeError as ex:
-        raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-    balance_store.append(final_balance)
-    try:
-        with open(BALANCES_STORE_FILE, "w", encoding="utf-8", newline="") as file:
-            json.dump(balance_store, file, indent=2)
-    except FileNotFoundError as ex:
-        raise AccountManagementException("Wrong file  or file path") from ex
