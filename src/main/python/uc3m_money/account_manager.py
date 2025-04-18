@@ -1,13 +1,14 @@
 """Account manager module """
 from datetime import datetime, timezone
 from uc3m_money.account_management_exception import AccountManagementException
-from uc3m_money.storage.json_store import save_transfer_request, input_deposit_json_store, deposit_json_store, \
+from uc3m_money.storage.json_store import input_deposit_json_store,\
     transactions_json_store, account_balance_json_store
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
 from uc3m_money.attributes.iban import Iban
 from uc3m_money.storage.transfer_request_json_store import TransferRequestJsonStore
+from uc3m_money.storage.deposit_json_store import DepositJsonStore
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -42,7 +43,8 @@ class AccountManager:
         new_deposit = AccountDeposit(to_iban=deposit_iban,
                                      deposit_amount=deposit_amount)
 
-        deposit_json_store(new_deposit)
+        all_deposits = DepositJsonStore()
+        all_deposits.add_item(new_deposit)
 
         return new_deposit.deposit_signature
 
