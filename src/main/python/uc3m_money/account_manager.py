@@ -7,6 +7,7 @@ from uc3m_money.storage.json_store import save_transfer_request, input_deposit_j
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
 from uc3m_money.attributes.iban import Iban
+from uc3m_money.storage.transfer_request_json_store import TransferRequestJsonStore
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -29,7 +30,8 @@ class AccountManager:
                                      transfer_date=date,
                                      transfer_amount=amount)
 
-        save_transfer_request(new_transfer_request)
+        all_transfers = TransferRequestJsonStore()
+        all_transfers.add_item(new_transfer_request)
 
         return new_transfer_request.transfer_code
 
