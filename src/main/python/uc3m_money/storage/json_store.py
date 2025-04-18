@@ -1,6 +1,6 @@
 import json
 
-from ..account_management_config import DEPOSITS_STORE_FILE, TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE
+from ..account_management_config import TRANSACTIONS_STORE_FILE, BALANCES_STORE_FILE
 from ..account_management_exception import AccountManagementException
 
 class JsonStore:

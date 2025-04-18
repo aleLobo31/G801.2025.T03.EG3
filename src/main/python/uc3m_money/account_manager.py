@@ -9,6 +9,7 @@ from uc3m_money.account_deposit import AccountDeposit
 from uc3m_money.attributes.iban import Iban
 from uc3m_money.storage.transfer_request_json_store import TransferRequestJsonStore
 from uc3m_money.storage.deposit_json_store import DepositJsonStore
+from uc3m_money.storage.account_balance_json_store import AccountBalanceJsonStore
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
@@ -59,7 +60,9 @@ class AccountManager:
                         "time": datetime.timestamp(datetime.now(timezone.utc)),
                         "BALANCE": total_balance}
 
-        account_balance_json_store(final_balance)
+        all_balances = AccountBalanceJsonStore()
+        all_balances.add_item(final_balance)
+
         return True
 
     def get_total_balance(self, iban, transaction_store):
