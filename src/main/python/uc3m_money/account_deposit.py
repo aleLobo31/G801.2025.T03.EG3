@@ -1,11 +1,15 @@
 """Contains the class OrderShipping"""
+import json
 from datetime import datetime, timezone
 import hashlib
 
+from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.attributes.iban import Iban
 from uc3m_money.attributes.deposit_amount import DepositAmount
+from uc3m_money.storage.InputDepositJsonStore import InputDepositJsonStore
 
-class AccountDeposit():
+
+class AccountDeposit:
     """Class representing the information required for shipping of an order"""
 
     def __init__(self,
@@ -17,6 +21,18 @@ class AccountDeposit():
         self.__deposit_amount = DepositAmount(deposit_amount).attribute_value
         justnow = datetime.now(timezone.utc)
         self.__deposit_date = datetime.timestamp(justnow)
+
+    @classmethod
+    def create_new_deposit_from_file(cls, input_file):
+        new_deposit = InputDepositJsonStore(input_file)
+        input_deposit = new_deposit.load_list_from_file()
+        try:
+            deposit_iban = input_deposit["IBAN"]
+            deposit_amount = input_deposit["AMOUNT"]
+        except KeyError as e:
+            raise AccountManagementException("Error - Invalid Key in JSON") from e
+        new_deposit = cls(to_iban=deposit_iban, deposit_amount=deposit_amount)
+        return new_deposit
 
     def to_json(self):
         """returns the object data in json format"""

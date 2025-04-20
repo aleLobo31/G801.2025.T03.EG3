@@ -17,7 +17,8 @@ class AccountManager:
     def __init__(self):
         pass
     #pylint: disable=too-many-arguments
-    def transfer_request(self, from_iban: str,
+    @staticmethod
+    def transfer_request(from_iban: str,
                          to_iban: str,
                          concept: str,
                          transfer_type: str,
@@ -38,32 +39,18 @@ class AccountManager:
 
         return new_transfer_request.transfer_code
 
-    def deposit_into_account(self, input_file:str)->str:
+    @staticmethod
+    def deposit_into_account(input_file:str)->str:
         """manages the deposits received for accounts"""
-        try:
-            with open(input_file, "r", encoding="utf-8", newline="") as file:
-                input_deposit = json.load(file)
-        except FileNotFoundError as ex:
-            raise AccountManagementException("Error: file input not found") from ex
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        # comprobar valores del fichero
-        try:
-            deposit_iban = input_deposit["IBAN"]
-            deposit_amount = input_deposit["AMOUNT"]
-        except KeyError as e:
-            raise AccountManagementException("Error - Invalid Key in JSON") from e
-
-        new_deposit = AccountDeposit(to_iban=deposit_iban,
-                                     deposit_amount=deposit_amount)
+        new_deposit = AccountDeposit.create_new_deposit_from_file(input_file)
 
         all_deposits = DepositJsonStore()
         all_deposits.add_item(new_deposit)
 
         return new_deposit.deposit_signature
 
-    def transactions_json_store(self):
+    @staticmethod
+    def transactions_json_store():
         try:
             with open(TRANSACTIONS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
                 transaction_store = json.load(file)
@@ -88,7 +75,8 @@ class AccountManager:
 
         return True
 
-    def get_total_balance(self, iban, transaction_store):
+    @staticmethod
+    def get_total_balance(iban, transaction_store):
         iban_found = False
         total_balance = 0
         for transaction in transaction_store:
