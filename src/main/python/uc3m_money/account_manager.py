@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
-from uc3m_money.accountBalance import AccountBalance
+from uc3m_money.account_balance import AccountBalance
 from uc3m_money.storage.transfer_request_json_store import TransferRequestJsonStore
 from uc3m_money.storage.deposit_json_store import DepositJsonStore
 from uc3m_money.storage.account_balance_json_store import AccountBalanceJsonStore

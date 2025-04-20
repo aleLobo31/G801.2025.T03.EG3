@@ -6,7 +6,7 @@ import hashlib
 from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.attributes.iban import Iban
 from uc3m_money.attributes.deposit_amount import DepositAmount
-from uc3m_money.storage.InputDepositJsonStore import InputDepositJsonStore
+from uc3m_money.storage.input_deposit_json_store import InputDepositJsonStore
 
 
 class AccountDeposit:
