@@ -1,13 +1,9 @@
 """Account manager module """
-import json
 from datetime import datetime, timezone
-
-from uc3m_money.account_management_config import TRANSACTIONS_STORE_FILE
-from uc3m_money.account_management_exception import AccountManagementException
 
 from uc3m_money.transfer_request import TransferRequest
 from uc3m_money.account_deposit import AccountDeposit
-from uc3m_money.attributes.iban import Iban
+from uc3m_money.accountBalance import AccountBalance
 from uc3m_money.storage.transfer_request_json_store import TransferRequestJsonStore
 from uc3m_money.storage.deposit_json_store import DepositJsonStore
 from uc3m_money.storage.account_balance_json_store import AccountBalanceJsonStore
@@ -50,40 +46,15 @@ class AccountManager:
         return new_deposit.deposit_signature
 
     @staticmethod
-    def transactions_json_store():
-        try:
-            with open(TRANSACTIONS_STORE_FILE, "r", encoding="utf-8", newline="") as file:
-                transaction_store = json.load(file)
-        except FileNotFoundError as ex:
-            raise AccountManagementException("Wrong file  or file path") from ex
-        except json.JSONDecodeError as ex:
-            raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
-        return  transaction_store
-
-    def calculate_balance(self, iban:str)->bool:
+    def calculate_balance(iban:str)->bool:
         """calculate the balance for a given iban"""
-        iban = Iban(iban).attribute_value
-        transaction_store = self.transactions_json_store()
-        total_balance = self.get_total_balance(iban, transaction_store)
+        new_account_balance = AccountBalance(iban)
 
-        final_balance = {"IBAN": iban,
-                        "time": datetime.timestamp(datetime.now(timezone.utc)),
-                        "BALANCE": total_balance}
+        final_balance = {"IBAN": new_account_balance.iban,
+                         "time": datetime.timestamp(datetime.now(timezone.utc)),
+                         "BALANCE": new_account_balance.total_balance}
 
         all_balances = AccountBalanceJsonStore()
         all_balances.add_item(final_balance)
 
         return True
-
-    @staticmethod
-    def get_total_balance(iban, transaction_store):
-        iban_found = False
-        total_balance = 0
-        for transaction in transaction_store:
-            # print(transaction["IBAN"] + " - " + iban)
-            if transaction["IBAN"] == iban:
-                total_balance += float(transaction["amount"])
-                iban_found = True
-        if not iban_found:
-            raise AccountManagementException("IBAN not found")
-        return total_balance
