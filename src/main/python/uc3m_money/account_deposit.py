@@ -1,5 +1,4 @@
 """Contains the class OrderShipping"""
-import json
 from datetime import datetime, timezone
 import hashlib
 
@@ -25,7 +24,7 @@ class AccountDeposit:
     @classmethod
     def create_new_deposit_from_file(cls, input_file):
         new_deposit = InputDepositJsonStore(input_file)
-        input_deposit = new_deposit.load_list_from_file()
+        input_deposit = new_deposit.load_list_from_file(fnf_error=True)
         try:
             deposit_iban = input_deposit["IBAN"]
             deposit_amount = input_deposit["AMOUNT"]

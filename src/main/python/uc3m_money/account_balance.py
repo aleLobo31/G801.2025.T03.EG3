@@ -10,7 +10,7 @@ class AccountBalance:
 
     def get_total_balance(self, iban):
         transaction_store = TransactionJsonStore()
-        transactions = transaction_store.load_list_from_file()
+        transactions = transaction_store.load_list_from_file(fnf_error=True)
 
         iban_found = False
         total_balance = 0
