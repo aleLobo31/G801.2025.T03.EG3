@@ -7,7 +7,7 @@ class JsonStore:
     _file_name = ""
 
     def __init__(self):
-        self.load_list_from_file()
+        ...
 
     def load_list_from_file(self, fnf_error=False):
         try:
@@ -30,6 +30,7 @@ class JsonStore:
             raise AccountManagementException("JSON Decode Error - Wrong JSON Format") from ex
 
     def add_item(self, item):
+        self.load_list_from_file()
         self._data_list.append(item)
         self.save_list_to_file()
 

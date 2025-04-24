@@ -3,11 +3,19 @@ from ..account_management_exception import AccountManagementException
 from ..account_management_config import TRANSFERS_STORE_FILE
 
 
-class TransferRequestJsonStore(JsonStore):
-    _file_name = TRANSFERS_STORE_FILE
+class TransferRequestJsonStore:
+    class __TransferRequestJsonStore(JsonStore):
+        _file_name = TRANSFERS_STORE_FILE
 
-    def add_item(self, item):
-        transfer_request_found = self.find_item(key="transfer_code", value=item.transfer_code)
-        if transfer_request_found:
-            raise AccountManagementException("Duplicated transfer in transfer list")
-        super().add_item(item.to_json())
+        def add_item(self, item):
+            transfer_request_found = self.find_item(key="transfer_code", value=item.transfer_code)
+            if transfer_request_found:
+                raise AccountManagementException("Duplicated transfer in transfer list")
+            super().add_item(item.to_json())
+
+    __instance = None
+
+    def __new__(cls):
+        if not TransferRequestJsonStore.__instance:
+            TransferRequestJsonStore.__instance = TransferRequestJsonStore.__TransferRequestJsonStore()
+        return TransferRequestJsonStore.__instance
