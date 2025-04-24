@@ -1,3 +1,4 @@
+"""Json store singleton test cases"""
 import unittest
 from uc3m_money.storage.account_balance_json_store import AccountBalanceJsonStore
 from uc3m_money.storage.deposit_json_store import DepositJsonStore
@@ -6,7 +7,9 @@ from uc3m_money.storage.transaction_json_store import TransactionJsonStore
 from uc3m_money.storage.transfer_request_json_store import TransferRequestJsonStore
 
 class TestSingletonStorageTests(unittest.TestCase):
+    """Class for testing all json store classes"""
     def test_singleton_store(self):
+        """Testing all classes that does not have parameters"""
         stores = [
             (TransferRequestJsonStore, "TransferRequestJsonStore"),
             (DepositJsonStore, "DepositJsonStore"),
@@ -25,15 +28,15 @@ class TestSingletonStorageTests(unittest.TestCase):
                 self.assertEqual(instance2, instance3)
 
     def test_singleton_input_deposit_json_store(self):
-            input_deposit_json_store_1 = InputDepositJsonStore("File1")
-            input_deposit_json_store_2 = InputDepositJsonStore("File1")
-            input_deposit_json_store_3 = InputDepositJsonStore("File1")
+        """Testing a class that has one parameter"""
+        input_deposit_json_store_1 = InputDepositJsonStore("File1")
+        input_deposit_json_store_2 = InputDepositJsonStore("File1")
+        input_deposit_json_store_3 = InputDepositJsonStore("File1")
 
-            self.assertEqual(input_deposit_json_store_1, input_deposit_json_store_2)
-            self.assertEqual(input_deposit_json_store_1, input_deposit_json_store_3)
-            self.assertEqual(input_deposit_json_store_2, input_deposit_json_store_3)
+        self.assertEqual(input_deposit_json_store_1, input_deposit_json_store_2)
+        self.assertEqual(input_deposit_json_store_1, input_deposit_json_store_3)
+        self.assertEqual(input_deposit_json_store_2, input_deposit_json_store_3)
 
-            input_deposit_json_store_4 = InputDepositJsonStore("File2")
+        input_deposit_json_store_4 = InputDepositJsonStore("File2")
 
-            self.assertEqual(input_deposit_json_store_1, input_deposit_json_store_4)
-
+        self.assertEqual(input_deposit_json_store_1, input_deposit_json_store_4)

@@ -1,3 +1,4 @@
+# pylint: skip-file
 #   -*- coding: utf-8 -*-
 from pybuilder.core import use_plugin, init
 
@@ -6,7 +7,7 @@ use_plugin("python.unittest")
 use_plugin("python.coverage")
 
 
-name = "G8X.2025.TYY.GE2"
+name = "G801.2025.T03.EG3"
 default_task = "publish"
 
 

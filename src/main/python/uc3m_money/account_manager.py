@@ -10,7 +10,7 @@ from uc3m_money.storage.account_balance_json_store import AccountBalanceJsonStor
 
 class AccountManager:
     """Class for providing the methods for managing the orders"""
-    class __AccountManager:
+    class _AccountManager:
         def __init__(self):
             pass
         #pylint: disable=too-many-arguments
@@ -32,7 +32,7 @@ class AccountManager:
                                          transfer_amount=amount)
 
             all_transfers = TransferRequestJsonStore()
-            all_transfers.add_item(new_transfer_request)
+            all_transfers.add_item(new_transfer_request) # pylint: disable=no-member
 
             return new_transfer_request.transfer_code
 
@@ -42,7 +42,7 @@ class AccountManager:
             new_deposit = AccountDeposit.create_new_deposit_from_file(input_file)
 
             all_deposits = DepositJsonStore()
-            all_deposits.add_item(new_deposit)
+            all_deposits.add_item(new_deposit) # pylint: disable=no-member
 
             return new_deposit.deposit_signature
 
@@ -56,7 +56,7 @@ class AccountManager:
                              "BALANCE": new_account_balance.total_balance}
 
             all_balances = AccountBalanceJsonStore()
-            all_balances.add_item(final_balance)
+            all_balances.add_item(final_balance) # pylint: disable=no-member
 
             return True
 
@@ -64,5 +64,5 @@ class AccountManager:
 
     def __new__(cls):
         if not AccountManager.__instance:
-            AccountManager.__instance = AccountManager.__AccountManager()
+            AccountManager.__instance = AccountManager._AccountManager()
         return AccountManager.__instance

@@ -13,7 +13,7 @@ class AccountDeposit:
 
     def __init__(self,
                  to_iban: str,
-                 deposit_amount: float):
+                 deposit_amount: str):
         self.__alg = "SHA-256"
         self.__type = "DEPOSIT"
         self.__to_iban = Iban(to_iban).attribute_value
@@ -23,8 +23,9 @@ class AccountDeposit:
 
     @classmethod
     def create_new_deposit_from_file(cls, input_file):
+        """return a new deposit read from the input_file"""
         new_deposit = InputDepositJsonStore(input_file)
-        input_deposit = new_deposit.load_list_from_file(fnf_error=True)
+        input_deposit = new_deposit.load_list_from_file(fnf_error=True) # pylint: disable=no-member
         try:
             deposit_iban = input_deposit["IBAN"]
             deposit_amount = input_deposit["AMOUNT"]

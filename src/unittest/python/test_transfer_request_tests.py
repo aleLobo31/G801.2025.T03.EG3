@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Transfer Request test cases"""
 import csv
 import json
@@ -60,7 +61,7 @@ class TestTransferRequestTest(TestCase):
 
                 if valid == "VALID":
                     with self.subTest(test_id + valid):
-                        valor = mngr.transfer_request(from_iban=iban_from,
+                        valor = mngr.transfer_request(from_iban=iban_from,          # pylint: disable=no-member
                                                       to_iban=iban_to,
                                                       transfer_type=transfer_type,
                                                       amount=number_amount,
@@ -95,7 +96,7 @@ class TestTransferRequestTest(TestCase):
                         else:
                             hash_original = ""
                         with self.assertRaises(AccountManagementException) as c_m:
-                            valor = mngr.transfer_request(from_iban=iban_from,
+                            valor = mngr.transfer_request(from_iban=iban_from,          # pylint: disable=no-member
                                                           to_iban=iban_to,
                                                           transfer_type=transfer_type,
                                                           amount=number_amount,
@@ -124,7 +125,7 @@ class TestTransferRequestTest(TestCase):
         transfer_date = "22/03/2025"
         transfer_concept = "Testing duplicated transfers"
         mngr  = AccountManager()
-        mngr.transfer_request(from_iban=iban_from,
+        mngr.transfer_request(from_iban=iban_from,          # pylint: disable=no-member
                               to_iban=iban_to,
                               transfer_type=transfer_type,
                               amount=transfer_amount,
@@ -137,7 +138,7 @@ class TestTransferRequestTest(TestCase):
         else:
             hash_original = ""
         with self.assertRaises(AccountManagementException) as c_m:
-            mngr.transfer_request(from_iban=iban_from,
+            mngr.transfer_request(from_iban=iban_from,              # pylint: disable=no-member
                                   to_iban=iban_to,
                                   transfer_type=transfer_type,
                                   amount=transfer_amount,
@@ -165,7 +166,7 @@ class TestTransferRequestTest(TestCase):
         transfer_date = "22/03/2025"
         transfer_concept = "Testing duplicated transfers"
         mngr  = AccountManager()
-        res = mngr.transfer_request(from_iban=iban_from,
+        res = mngr.transfer_request(from_iban=iban_from,                # pylint: disable=no-member
                                     to_iban=iban_to,
                                     transfer_type=transfer_type,
                                     amount=transfer_amount,
@@ -199,7 +200,7 @@ class TestTransferRequestTest(TestCase):
             transfer_date = "23/03/2025"
             transfer_concept = "Testing duplicated transfers"
             mngr = AccountManager()
-            res = mngr.transfer_request(from_iban=iban_from,
+            res = mngr.transfer_request(from_iban=iban_from,                # pylint: disable=no-member
                                         to_iban=iban_to,
                                         transfer_type=transfer_type,
                                         amount=transfer_amount,
@@ -240,7 +241,7 @@ class TestTransferRequestTest(TestCase):
         else:
             hash_original = ""
         with self.assertRaises(AccountManagementException) as c_m:
-            mngr.transfer_request(from_iban=iban_from,
+            mngr.transfer_request(from_iban=iban_from,                  # pylint: disable=no-member
                                   to_iban=iban_to,
                                   transfer_type=transfer_type,
                                   amount=transfer_amount,

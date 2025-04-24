@@ -1,10 +1,13 @@
-from .json_store import JsonStore
-from ..account_management_exception import AccountManagementException
-from ..account_management_config import TRANSFERS_STORE_FILE
+"""Transfer request json class module"""
+from uc3m_money.storage.json_store import JsonStore
+from uc3m_money.account_management_exception import AccountManagementException
+from uc3m_money.account_management_config import TRANSFERS_STORE_FILE
 
 
 class TransferRequestJsonStore:
-    class __TransferRequestJsonStore(JsonStore):
+    """Transfer request json class implementing singleton"""
+    class _TransferRequestJsonStore(JsonStore):
+        """Private class with all the implementation"""
         _file_name = TRANSFERS_STORE_FILE
 
         def add_item(self, item):
@@ -17,5 +20,5 @@ class TransferRequestJsonStore:
 
     def __new__(cls):
         if not TransferRequestJsonStore.__instance:
-            TransferRequestJsonStore.__instance = TransferRequestJsonStore.__TransferRequestJsonStore()
+            TransferRequestJsonStore.__instance = TransferRequestJsonStore._TransferRequestJsonStore()
         return TransferRequestJsonStore.__instance

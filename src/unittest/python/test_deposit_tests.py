@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Deposit into account test cases """
 import csv
 import json
@@ -50,7 +51,7 @@ class TestDepositIntoAccountTests(TestCase):
                     with self.subTest(test_id + valid):
                         # removes all the deposits to be sure that the method works
                         self.setUp()
-                        valor = mngr.deposit_into_account(test_file)
+                        valor = mngr.deposit_into_account(test_file)        # pylint: disable=no-member
                         self.assertEqual(result, valor)
                         # Check if this deposit has been stored
 
@@ -72,7 +73,7 @@ class TestDepositIntoAccountTests(TestCase):
                             hash_original = ""
 
                         with self.assertRaises(AccountManagementException) as c_m:
-                            valor = mngr.deposit_into_account(test_file)
+                            valor = mngr.deposit_into_account(test_file)            # pylint: disable=no-member
                         self.assertEqual(c_m.exception.message, result)
                         if os.path.isfile(DEPOSITS_STORE_FILE):
                             with open(DEPOSITS_STORE_FILE, "r",

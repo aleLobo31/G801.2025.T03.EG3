@@ -1,9 +1,12 @@
-from .json_store import JsonStore
-from ..account_management_config import DEPOSITS_STORE_FILE
+"""Deposit json class module"""
+from uc3m_money.storage.json_store import JsonStore
+from uc3m_money.account_management_config import DEPOSITS_STORE_FILE
 
 
 class DepositJsonStore:
-    class __DepositJsonStore(JsonStore):
+    """Deposit json class implementing singleton"""
+    class _DepositJsonStore(JsonStore):
+        """private class with all the deposit json implementation"""
         _file_name = DEPOSITS_STORE_FILE
 
         def add_item(self, item):
@@ -14,5 +17,5 @@ class DepositJsonStore:
 
     def __new__(cls):
         if not DepositJsonStore.__instance:
-            DepositJsonStore.__instance = DepositJsonStore.__DepositJsonStore()
+            DepositJsonStore.__instance = DepositJsonStore._DepositJsonStore()
         return DepositJsonStore.__instance

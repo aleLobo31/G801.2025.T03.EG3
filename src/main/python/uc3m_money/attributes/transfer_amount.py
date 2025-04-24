@@ -1,14 +1,17 @@
+"""Attribute class TransferAmount module"""
 from uc3m_money.account_management_exception import AccountManagementException
 from uc3m_money.attributes.attribute import Attribute
 
 class TransferAmount(Attribute):
+    """Attribute class TransferAmount"""
     def __init__(self, amount):
+        super().__init__()
         self._exception_message = "Invalid transfer amount"
         self._attribute_value = self._validate(amount)
 
-    def _validate(self, amount):
+    def _validate(self, value):
         try:
-            parsed_float_amount = float(amount)
+            parsed_float_amount = float(value)
         except ValueError as ex:
             raise AccountManagementException(self._exception_message) from ex
         parsed_string_amount = str(parsed_float_amount)
@@ -18,4 +21,4 @@ class TransferAmount(Attribute):
                 raise AccountManagementException(self._exception_message)
         if parsed_float_amount < 10 or parsed_float_amount > 10000:
             raise AccountManagementException(self._exception_message)
-        return amount
+        return value

@@ -40,7 +40,7 @@ class TestCalculateBalance(TestCase):
     def test_calculate_balance_1 (self):
         """path 1: all ok - entering the loop"""
         mngr = AccountManager()
-        res = mngr.calculate_balance(iban="ES3559005439021242088295")
+        res = mngr.calculate_balance(iban="ES3559005439021242088295")       # pylint: disable=no-member
         self.assertTrue(res)
         data = self.read_file()
         data_found = False
@@ -63,7 +63,7 @@ class TestCalculateBalance(TestCase):
             hash_original = ""
 
         with self.assertRaises(AccountManagementException) as cm_obj:
-            mngr.calculate_balance("ES1559005439021242088295")
+            mngr.calculate_balance("ES1559005439021242088295")              # pylint: disable=no-member
         self.assertEqual("Invalid IBAN control digit",cm_obj.exception.message)
 
         if os.path.isfile(BALANCES_STORE_FILE):
@@ -87,7 +87,7 @@ class TestCalculateBalance(TestCase):
             hash_original = ""
 
         try:
-            mngr.calculate_balance(iban="ES3559005439021242088295")
+            mngr.calculate_balance(iban="ES3559005439021242088295")                 # pylint: disable=no-member
         except AccountManagementException as ex:
             if ex.message == "Wrong file  or file path":
                 res = True
@@ -120,7 +120,7 @@ class TestCalculateBalance(TestCase):
         else:
             hash_original = ""
         try:
-            mngr.calculate_balance(iban="ES3559005439021242088295")
+            mngr.calculate_balance(iban="ES3559005439021242088295")                 # pylint: disable=no-member
         except AccountManagementException as ex:
             if ex.message == "JSON Decode Error - Wrong JSON Format":
                 res = True
@@ -154,7 +154,7 @@ class TestCalculateBalance(TestCase):
         msg = ""
         res = False
         try:
-            mngr.calculate_balance(iban="ES3559005439021242088295")
+            mngr.calculate_balance(iban="ES3559005439021242088295")             # pylint: disable=no-member
         except AccountManagementException as ex:
             if ex.message == "IBAN not found":
                 res = True
@@ -185,7 +185,7 @@ class TestCalculateBalance(TestCase):
             hash_original = ""
 
         with self.assertRaises(AccountManagementException) as cm_obj:
-            mngr.calculate_balance("ES9420805801101234567891")
+            mngr.calculate_balance("ES9420805801101234567891")                  # pylint: disable=no-member
         self.assertEqual("IBAN not found", cm_obj.exception.message)
 
         if os.path.isfile(BALANCES_STORE_FILE):
@@ -209,7 +209,7 @@ class TestCalculateBalance(TestCase):
         else:
             hash_original = ""
         try:
-            mngr.calculate_balance(iban="ES3559005439021242088295")
+            mngr.calculate_balance(iban="ES3559005439021242088295")                 # pylint: disable=no-member
         except AccountManagementException as ex:
             if ex.message == "JSON Decode Error - Wrong JSON Format":
                 res = True
