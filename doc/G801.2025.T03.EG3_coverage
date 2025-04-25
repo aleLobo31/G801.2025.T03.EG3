@@ -1,0 +1,27 @@
+Name                                                Stmts   Miss Branch BrPart  Cover
+-------------------------------------------------------------------------------------
+__init__.py                                             0      0      0      0   100%
+uc3m_money/__init__.py                                  5      0      0      0   100%
+uc3m_money/account_balance.py                          25      0      6      0   100%
+uc3m_money/account_deposit.py                          50      6      0      0    88%
+uc3m_money/account_management_config.py                 7      0      0      0   100%
+uc3m_money/account_management_exception.py             10      1      0      0    90%
+uc3m_money/account_manager.py                          35      0      2      0   100%
+uc3m_money/attributes/__init__.py                       0      0      0      0   100%
+uc3m_money/attributes/attribute.py                     19      1      2      0    95%
+uc3m_money/attributes/concept.py                        7      0      0      0   100%
+uc3m_money/attributes/deposit_amount.py                13      0      2      0   100%
+uc3m_money/attributes/iban.py                          24      0      2      0   100%
+uc3m_money/attributes/transfer_amount.py               20      0      6      1    96%
+uc3m_money/attributes/transfer_date.py                 19      0      4      0   100%
+uc3m_money/attributes/transfer_type.py                  7      0      0      0   100%
+uc3m_money/storage/__init__.py                          0      0      0      0   100%
+uc3m_money/storage/account_balance_json_store.py       10      0      2      0   100%
+uc3m_money/storage/deposit_json_store.py               13      0      2      0   100%
+uc3m_money/storage/input_deposit_json_store.py         15      0      2      0   100%
+uc3m_money/storage/json_store.py                       34      4      6      0    90%
+uc3m_money/storage/transaction_json_store.py           15      0      2      0   100%
+uc3m_money/storage/transfer_request_json_store.py      16      0      4      0   100%
+uc3m_money/transfer_request.py                         64     13      0      0    80%
+-------------------------------------------------------------------------------------
+TOTAL                                                 408     25     42      1    94%
